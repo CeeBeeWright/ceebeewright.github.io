@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Tally — shared expense splitter</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iIzE4MjQyMCIvPjxnIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIyLjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+PGxpbmUgeDE9IjEwIiB5MT0iOSIgeDI9IjEwIiB5Mj0iMjMiLz48bGluZSB4MT0iMTYiIHkxPSI5IiB4Mj0iMTYiIHkyPSIyMyIvPjxsaW5lIHgxPSIyMiIgeTE9IjkiIHgyPSIyMiIgeTI9IjIzIi8+PGxpbmUgeDE9IjciIHkxPSIyMiIgeDI9IjI1IiB5Mj0iMTAiLz48L2c+PC9zdmc+" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
@@ -324,7 +325,7 @@
   .field input:focus, .field select:focus, .amount-in input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,92,67,.1); }
   .amount-in { position: relative; }
   .amount-in .cur-sym { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--soft); font-family: var(--mono); pointer-events: none; }
-  .amount-in input { padding-left: 26px; font-family: var(--mono); font-weight: 700; font-size: 17px; }
+  .amount-in input { padding-left: 30px; font-family: var(--mono); font-weight: 700; font-size: 17px; }
   .amount-in.read { display: flex; align-items: baseline; gap: 4px; background: var(--row); border: 1px dashed var(--line); border-radius: 10px; padding: 11px 12px; }
   .amount-in.read .rv { font-family: var(--mono); font-weight: 700; font-size: 17px; }
   .amount-in.read .rl { font-size: 12px; color: var(--faint); margin-left: auto; }
@@ -833,6 +834,7 @@ function simplifyDebts(bal){
 }
 
 async function loadGroups(){
+  try { await supabase.rpc("claim_my_invites"); } catch(e){}
   const { data, error } = await supabase.from("groups").select("*").order("created_at",{ascending:true});
   if(error){ fail(error); return; }
   state.groups = data || [];
