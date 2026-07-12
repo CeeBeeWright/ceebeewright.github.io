@@ -1417,12 +1417,26 @@ $("#verifyPhone").addEventListener("click", async ()=>{
 });
 $("#resetCfg").addEventListener("click",()=>{ clearCfg(); supabase=null; session=null; showScreen("config"); });
 
+// Finish an email magic-link / signup confirmation whose link points at our own domain.
+// The template sends users to https://keepthetally.com?token_hash=...&type=... instead of
+// the supabase.co verify URL, so we complete verification here with verifyOtp.
+async function completeEmailLink(){
+  const p = new URLSearchParams(location.search);
+  const token_hash = p.get("token_hash"), type = p.get("type");
+  if(!token_hash || !type) return;
+  const { error } = await supabase.auth.verifyOtp({ token_hash, type });
+  p.delete("token_hash"); p.delete("type");
+  const qs = p.toString();
+  history.replaceState({}, "", location.pathname + (qs ? ("?"+qs) : ""));
+  if(error){ showScreen("auth"); authMsg(error.message || "That sign-in link is invalid or has expired \u2014 request a new one.", false); }
+}
 async function initClient(){
   const cfg=getCfg();
   if(!cfg){ showScreen("config"); return; }
   try{ supabase = createClient(cfg.url, cfg.anonKey); }
   catch(e){ showScreen("config"); cfgErr("Could not connect with those details. Double-check and try again."); return; }
   supabase.auth.onAuthStateChange((_evt, s)=>{ session=s; routeAuth(); });
+  await completeEmailLink();
   const { data } = await supabase.auth.getSession();
   session = data ? data.session : null;
   await routeAuth();
